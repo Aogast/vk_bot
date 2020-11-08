@@ -19,16 +19,45 @@ for event in longpoll.listen():
             if event.from_chat:
                 msg = event.text.lower()
                 id = event.chat_id
-                if msg in ['никита']:
-                    sender(id, 'вы хороший человек')
+                if msg == 'help':
+                    sender(id, '/add + время - назначить встречу\n'
+                               '/del + время - удалить встречу\n'
+                               '/list - показать список встерчь\n'
+                               'формат времени :\n'
+                               '13:47 понедельник')
+                if msg in '/привет':
+                    sender(id, 'хорошего дня')
                 if '/add' in msg:
                     f = open("data.txt", 'r')
                     notifications = f.read().split('\n')
                     f.close()
-                    f = open('data.txt', 'w')
-                    notifications.append(msg[5:])
-                    f.write('\n'.join(notifications))
+                    if msg[5:] not in notifications:
+                        f = open('data.txt', 'w')
+                        notifications.append(msg[5:])
+                        f.write('\n'.join(notifications))
+                        f.close()
+                        sender(id, 'Встреча назначена успешно.')
+                    else:
+                        sender(id, 'На данное время встреча уже назначена.')
+                if '/del' in msg:
+                    f = open("data.txt", 'r')
+                    notifications = f.read().split('\n')
                     f.close()
-                    print(notifications)
+                    if msg[5:] in notifications:
+                        f = open('data.txt', 'w')
+                        notifications.pop(notifications.index(msg[5:]))
+                        f.write('\n'.join(notifications))
+                        sender(id, 'Встреча успешно отменена.')
+                        f.close()
+                    else:
+                        sender(id, 'На данное время не былозапланированных встреч.')
+                if '/list' in msg:
+                    f = open("data.txt", 'r')
+                    notifications = f.read().split('\n')
+                    if notifications != ['']:
+                        sender(id, '\n'.join(notifications))
+                    else:
+                        sender(id, 'Пока что назначенных встреч нет. Спи скокойно, не беспокоясь о дедлайнах')
+
 
 
